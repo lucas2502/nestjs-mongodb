@@ -26,12 +26,13 @@ export class CreateEnterpriseDTO {
     @MinLength(1)
     @MaxLength(100)
     readonly end: string;
-
+/* 
     
     @IsNotEmpty()
-    @IsString()
-    @MinLength(1)
-    readonly userId: string;
+    @Type(() => CreateUserDTO)
+    @IsNotEmptyObject({ each: true }) //Objeto não pdoer vazio
+    @ValidateNested({ each: true}) //Também valide AuthorDTO
+    readonly user: CreateUserDTO; */
         
     readonly dateAt: Date;
 }

@@ -1,3 +1,4 @@
+//import * as bcrypt from 'bcrypt';
 import { Schema } from 'mongoose'
 
 export const UserSchema = new Schema({
@@ -25,9 +26,23 @@ export const UserSchema = new Schema({
         required: true
     },
     dateAt: {
-        type: Date
+        type: Date,
+        default: Date.now
     },
     dateUpdate: {
         type: Date
     }
 })
+
+/* UserSchema.pre('save', async function(next: mongoose.HookNextFunction) {
+    try {
+      if (!this.isModified('password')) {
+        return next();
+      }
+      const hashed = await bcrypt.hash(this['password'], 10);
+      this['password'] = hashed;
+      return next();
+    } catch (err) {
+      return next(err);
+    }
+  }); */

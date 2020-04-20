@@ -25,30 +25,29 @@ export class EnterpriseController {
 
     @Get(':user/:id')
     async getEnterpriseById(@Res() res, @Param('id') id: string, @Param('user') user: string): Promise<Enterprise[]>{
-        let data = null;
-
-        if(!data){
-            throw new NotFoundException('Does not existem itens')
-        }
 
         const validateUser = await this.enterpriseService.getUserEnterpriseById(id, user)
-        if(user === validateUser){
-            data = await this.enterpriseService.getEnterpriseById(id)
+        if(user == validateUser){
+            const data = await this.enterpriseService.getEnterpriseById(id)
             
+            if(!data){
+                throw new NotFoundException('Does not existem itens')
+            }
+            return res.status(200).json({
+                data
+            })            
         } else {
             throw new NotFoundException('Does not acess to item')  
         }
 
-        return res.status(200).json({
-            data
-        })
     }
 
-    @Get('user')
+    @Get(':user')
     async getEnterpriseByUser(@Res() res, @Param('user') user:string): Promise<Enterprise[]>{
         const data = await this.enterpriseService.getEnterpriseByUser(user)
+        
         if(!data){
-            
+            throw new NotFoundException('Does not existem itens')
         }
 
         return res.status(200).json({
@@ -59,37 +58,51 @@ export class EnterpriseController {
     @Post('/create/:id')
     async createEnterprise(
         @Res() res,
-        @Param('id') id:string,
+        @Param('id') id: string,
         @Body() createEnterpriseDTO: CreateEnterpriseDTO){
-        const body = {...createEnterpriseDTO, userId: String(id)}
         
-        const existId = this.enterpriseService.getEnterpriseById(id) 
-        if(!existId){
-            const data = await this.enterpriseService.createEnterprise(body)
+        const existEnterprise = await this.enterpriseService.getEnterpriseByCNPJ(createEnterpriseDTO.cnpj)
+        if(existEnterprise.length === 0){
+            const data = await this.enterpriseService.createEnterprise(createEnterpriseDTO, id)
             
             return res.status(200).json({
+                "message": "Create",
                 data
             })
         } else {
             return res.status(500).json({
-                data: 'Existe item'
+                data: 'Does not existe item'
             })
         }
     }
 
-    @Put('update/:id')
+    @Put('update/:user/:id')
     async updateEnterprise(
         @Res() res,
         @Param('id') id: string,
+        @Param('user') user: string,
         @Body() updateEnterpriseDTO: CreateEnterpriseDTO ): Promise<Enterprise>{
-        const data = await this.enterpriseService.updateEnterprise(id, updateEnterpriseDTO)
-        if(!data){
-            throw new NotFoundException('This item is not existem itens')
+            
+        const existEnterprise = await this.enterpriseService.getEnterpriseByCNPJ(updateEnterpriseDTO.cnpj)
+        if(existEnterprise){
+            const validateUser = await this.enterpriseService.getUserEnterpriseById(id, user)
+            if(user == validateUser){
+                const data = await this.enterpriseService.updateEnterprise(id, updateEnterpriseDTO)
+            
+                return res.status(200).json({
+                    "message": "Update", 
+                    data
+                })
+            } else {
+                return res.status(500).json({
+                    data: 'Does not permission edit item'
+                })
+            }
+        } else {
+            return res.status(500).json({
+                data: 'Does not existe item'
+            })
         }
-
-        return res.status(200).json({
-            data
-        })
     }
 
     @Delete(':user/:id')
@@ -97,21 +110,27 @@ export class EnterpriseController {
         @Res() res,
         @Param('id') id: string,
         @Param('user') user: string): Promise<Enterprise>{
-        let data = null;
-
-        if(!data){
-            throw new NotFoundException('Does not existem itens')
-        }
-        const validateUser = await this.enterpriseService.getUserEnterpriseById(id, user)
-        if(user === validateUser){
-            data = await this.enterpriseService.deleteEnterprise(id)
+            
+        const existEnterprise = await this.enterpriseService.getEnterpriseById(id)
+        if(existEnterprise){
+            const validateUser = await this.enterpriseService.getUserEnterpriseById(id, user)
+            if(user == validateUser){
+                const data = await this.enterpriseService.deleteEnterprise(id)
+            
+                return res.status(200).json({
+                    "message": "Delete", 
+                    data
+                })
+            } else {
+                return res.status(500).json({
+                    data: 'Does not permission edit item'
+                })
+            }
         } else {
-            throw new NotFoundException('Does not permission to delete item')
+            return res.status(500).json({
+                data: 'Does not existe item'
+            })
         }
-
-        return res.status(200).json({
-            data
-        })
     }
 
 }

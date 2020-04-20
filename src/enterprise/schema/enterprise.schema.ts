@@ -1,4 +1,5 @@
 import { Schema } from 'mongoose'
+import * as mongoose from 'mongoose'
 
 export const EnterpriseSchema = new Schema({
     name: {
@@ -18,13 +19,14 @@ export const EnterpriseSchema = new Schema({
         required: true
     },
 
-    userId: {
-        type: String,
-        required: true
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
     },
 
     dateAt: {
-        type: Date
+        type: Date,
+        default: Date.now
     },
     dateUpdate: {
         type: Date

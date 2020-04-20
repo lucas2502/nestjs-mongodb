@@ -26,13 +26,16 @@ export class EnterpriseService {
         return res;
     }
 
-    async createEnterprise(createEnterpriseDTO: CreateEnterpriseDTO): Promise<Enterprise>{ 
-        const res = new this.enterpriseModel(createEnterpriseDTO)
+    async createEnterprise(createEnterpriseDTO: CreateEnterpriseDTO, id: string): Promise<Enterprise>{ 
+        const res = new this.enterpriseModel({
+            ...createEnterpriseDTO,
+            user: id
+        })
         return res.save()
     }
 
     async updateEnterprise(id: string, updateEnterpriseDTO: CreateEnterpriseDTO): Promise<Enterprise>{
-        const res = await  this.enterpriseModel.findByIdAnfUpdate({ _id: id}, updateEnterpriseDTO, { new :true })
+        const res = await  this.enterpriseModel.findByIdAndUpdate({ _id: id}, updateEnterpriseDTO, { new :true })
         return res;
     }
 
@@ -43,8 +46,15 @@ export class EnterpriseService {
 
     async getUserEnterpriseById(id: string, user: string){
         const res = await this.enterpriseModel.findById(id)
-        if( res.userId === user) {
-            return res.userId
+
+        if( res.user == user) {
+            
+            return res.user
         }
+    }
+
+    async getEnterpriseByCNPJ(cnpj: number): Promise<Enterprise[]> {
+        const res = await this.enterpriseModel.find({ cnpj })
+        return res;
     }
 }
