@@ -20,7 +20,7 @@ export class CreateUserDTO {
     @IsString()
     @MinLength(2)
     @MaxLength(100)
-    readonly name: string;
+    readonly username: string;
 
     @IsNotEmpty()
     @IsString()
@@ -40,7 +40,6 @@ export class CreateUserDTO {
     @MaxLength(100)
     readonly password: string;
     
-    @IsNotEmpty()
     @IsObject()
     readonly typeUser: object;
     

@@ -1,17 +1,19 @@
-import { Controller, Post, Get, Delete, Put, Res, NotFoundException, Param, Body } from '@nestjs/common';
+import { Controller, Post, Get, Delete, Put, Res, NotFoundException, Param, Body, UseGuards} from '@nestjs/common';
 import { CreateUserDTO } from './dto/user.dto';
 import { UserService } from './user.service'
 import { User } from './interface/user.interface'
 import { identity, throwError } from 'rxjs';
+import { AuthGuard} from '@nestjs/passport';
 
 @Controller('user')
 export class UserController {
 
     constructor(
-        private userService: UserService
+        private userService: UserService,
     ){}
 
     @Get()
+    @UseGuards(AuthGuard('jwt'))
     async getAllUser(@Res() res): Promise<User[]>{
         const data = await this.userService.getAllUser()
 
@@ -25,6 +27,7 @@ export class UserController {
 
     }
 
+    @UseGuards(AuthGuard('jwt')) 
     @Get(':id')
     async getUserById(@Res() res, @Param('id') id: string): Promise<User>{
         const data = await this.userService.getUserById(id)
@@ -47,6 +50,7 @@ export class UserController {
         })
     }
 
+    @UseGuards(AuthGuard('jwt'))
     @Put('update/:id')
     async updateUser(@Res() res, @Param('id') id: string, @Body() updateUserDTO: CreateUserDTO): Promise<User>{
         const data = await this.userService.updateUser(id, updateUserDTO)
@@ -60,6 +64,7 @@ export class UserController {
         })
     }
 
+    @UseGuards(AuthGuard('jwt'))
     @Delete(':id')
     async deleteUser(@Res() res, @Param('id') id: string): Promise<User>{
         const data = await this.userService.deleteUser(id)

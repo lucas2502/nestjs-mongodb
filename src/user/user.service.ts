@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { Model } from 'mongoose'
 import { InjectModel } from '@nestjs/mongoose';
-
+import * as bcrypt from 'bcrypt';
 import { User } from './interface/user.interface';
 import { CreateUserDTO } from './dto/user.dto';
+import { LoginDTO } from '../auth/dto/auth.dto';
+import { Payload } from '../auth/payload'
 
 @Injectable()
 export class UserService {
@@ -37,4 +39,31 @@ export class UserService {
         return res;
 
     }
+
+    async findOne(username: string): Promise<User | undefined> {
+        const res = await this.userModel.find({ username })
+        return res;
+      }
+
+      async findByLogin(userDTO: LoginDTO) {
+        const { username, password } = userDTO;
+        
+        const user = await this.userModel
+          .findOne({ username })
+          .select('username password seller created address');
+        if (!user) {
+          throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+        }
+    
+        if (await bcrypt.compare(password, user.password)) {
+          return user;
+        } else {
+          throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+        }
+      }
+    
+      async findByPayload(payload: Payload) {
+        const { username } = payload;
+        return await this.userModel.findOne({ username });
+      }
 }

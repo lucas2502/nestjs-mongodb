@@ -2,7 +2,7 @@ import { Document } from 'mongoose'
 import * as mongoose from 'mongoose'
 
 export interface User extends Document {
-    readonly name: string;
+    readonly username: string;
     readonly surname: string;
     readonly email: string;
     readonly password: string;

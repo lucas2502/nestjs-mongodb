@@ -5,8 +5,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { FormModule } from './form/form.module';
-import { EnterpriseService } from './enterprise/enterprise.service';
 import { EnterpriseModule } from './enterprise/enterprise.module';
+import { AuthModule } from './auth/auth.module';
 import config from './config/keys'
 
 @Module({
@@ -20,7 +20,7 @@ import config from './config/keys'
       useNewUrlParser: true,
       useUnifiedTopology: true 
     }
-  )],
+  ), AuthModule],
   controllers: [AppController],
   providers: [AppService],
 })

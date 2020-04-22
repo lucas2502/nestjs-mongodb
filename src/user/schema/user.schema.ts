@@ -1,8 +1,9 @@
-//import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
+import * as mongoose from 'mongoose';
 import { Schema } from 'mongoose'
 
 export const UserSchema = new Schema({
-    name: {
+    username: {
         type: String,
         required: true
     },
@@ -34,15 +35,15 @@ export const UserSchema = new Schema({
     }
 })
 
-/* UserSchema.pre('save', async function(next: mongoose.HookNextFunction) {
+UserSchema.pre('save', async function(next: mongoose.HookNextFunction) {
     try {
       if (!this.isModified('password')) {
         return next();
       }
-      const hashed = await bcrypt.hash(this['password'], 10);
+      const hashed = await bcrypt.hashSync(this['password'], 10);
       this['password'] = hashed;
       return next();
     } catch (err) {
       return next(err);
     }
-  }); */
+  });
