@@ -4,9 +4,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcrypt';
 import { User } from './interface/user.interface';
 import { CreateUserDTO } from './dto/user.dto';
-import { LoginDTO } from '../auth/dto/auth.dto';
-import { Payload } from '../auth/payload'
-
 @Injectable()
 export class UserService {
 
@@ -26,6 +23,7 @@ export class UserService {
 
     async createUser(createUser: CreateUserDTO): Promise<User>{
         const res = new this.userModel(createUser)
+        res.password = await this.getHash(res.password)
         return res.save()
     }
 
@@ -40,30 +38,22 @@ export class UserService {
 
     }
 
-    async findOne(username: string): Promise<User | undefined> {
+    async getUserByUsername(username: string): Promise<User | undefined> {
         const res = await this.userModel.find({ username })
         return res;
       }
+    
 
-      async findByLogin(userDTO: LoginDTO) {
-        const { username, password } = userDTO;
-        
-        const user = await this.userModel
-          .findOne({ username })
-          .select('username password seller created address');
-        if (!user) {
-          throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
-        }
-    
-        if (await bcrypt.compare(password, user.password)) {
-          return user;
-        } else {
-          throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
-        }
+      async findOneByEmail(email: string){
+        const res = await this.userModel.find({ email })
+        return res;
       }
-    
-      async findByPayload(payload: Payload) {
-        const { username } = payload;
-        return await this.userModel.findOne({ username });
+
+      async getHash(password: string|undefined): Promise<string> {
+        return await bcrypt.hashSync(password, 10);
+    }
+
+    async compareHash(password: string, hash: string): Promise<boolean> {
+        return bcrypt.compare(password, hash)
       }
 }

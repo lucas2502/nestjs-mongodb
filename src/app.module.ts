@@ -20,7 +20,10 @@ import config from './config/keys'
       useNewUrlParser: true,
       useUnifiedTopology: true 
     }
-  ), AuthModule],
+    ), 
+    AuthModule,
+    
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

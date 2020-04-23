@@ -1,11 +1,7 @@
-import { Controller, Post, Get, Delete, Put, Res, NotFoundException, Param, Body, Request, UseGuards, HttpStatus } from '@nestjs/common';
-//import { LocalAuthGuard } from './local-auth.guard';
-//import { JwtAuthGuard } from './jwt-auth.guard';
+import { Controller, Post, Response, Body, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthGuard } from '@nestjs/passport';
 import { UserService } from 'src/user/user.service';
-import { CreateUserDTO } from '../user/dto/user.dto';
-//import { Payload } from './payload';
+import { User } from 'src/user/interface/user.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -16,34 +12,47 @@ export class AuthController {
     ){}
 
 
-    @UseGuards(AuthGuard('local'))
+    
     @Post('login')
-    async login(@Request() req) {
-      return this.authService.login(req.user);
-    }
-    /* async login(@Body() loginUserDTO: LoginDTO) {
-      const result  = await this.userService.validateUserByPassword(loginUserDTO)
-      if(result.sucess) {
-        return result.json(result.data)
-      } else {
-        return result.status(HttpStatus.UNAUTHORIZED).json({ message: result})
+    async loginUser(@Response() res: any, @Body() body: User) {
+      if (!(body && body.username && body.password)) {
+        return res.status(HttpStatus.FORBIDDEN).json({ message: 'Username and password are required!' });
       }
-       /*  const user = await this.userService.findByLogin(userDTO);
-        const payload: Payload = {
-          username: user.username,
-          seller: user.seller,
-        };
-        const token = await this.authService.signPayload(payload);
-        return { user, token };
-      } */
+  
+      const user = await this.userService.getUserByUsername(body.username);
+
+      if (user) {
+        const resHash = await this.userService.compareHash(body.password, user[0].password)
+        
+        if (resHash) {
+          const token = await this.authService.createToken(user[0].username)
+          
+          return res.status(HttpStatus.OK).json(token);
+        }
+      }
+  
+      return res.status(HttpStatus.FORBIDDEN).json({ message: 'Username or password wrong!' });
+    }
 
     @Post('register')
-    async register(@Res() res, @Body() createUser: CreateUserDTO){
-          const data = await this.userService.createUser(createUser)
-  
-          return res.status(200).json({
-              data
-          })
+    async registerUser(@Response() res: any, @Body() body: User) {
+      if (!(body && body.username && body.password)) {
+        return res.status(HttpStatus.FORBIDDEN).json({ message: 'Username and password are required!' });
       }
+
+      let user = await this.userService.getUserByUsername(body.username);
+      console.log('getUserByUsername', user)
+      if (!user.username) {
+        user = await this.userService.createUser(body);
+        if (user) {
+          console.log("user", user);
+        }
+        
+      } else {
+        return res.status(HttpStatus.FORBIDDEN).json({ message: 'Username exists' });
+      }
+
+      return res.status(HttpStatus.OK).json(user);
+    }
       
 }

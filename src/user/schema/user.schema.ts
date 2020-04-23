@@ -24,7 +24,6 @@ export const UserSchema = new Schema({
             admin: Boolean,
             dealer: Boolean,
         },
-        required: true
     },
     dateAt: {
         type: Date,
@@ -35,7 +34,7 @@ export const UserSchema = new Schema({
     }
 })
 
-UserSchema.pre('save', async function(next: mongoose.HookNextFunction) {
+/* UserSchema.pre('save', async function(next: mongoose.HookNextFunction) {
     try {
       if (!this.isModified('password')) {
         return next();
@@ -46,4 +45,4 @@ UserSchema.pre('save', async function(next: mongoose.HookNextFunction) {
     } catch (err) {
       return next(err);
     }
-  });
+  }); */
