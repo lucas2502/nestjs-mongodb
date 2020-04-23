@@ -37,10 +37,10 @@ export class AuthService {
       }
     
       private async passwordsAreEqual(
-        hash: string,
-        data: string
+        hashedPassword: string | undefined,
+        plainPassword: string | undefined
       ): Promise<boolean> {
-        return await bcrypt.compareSync(data, hash);
+        return bcrypt.compareSync(plainPassword, hashedPassword);
       }
       /* async validateUserByPassword(loginAttempt: LoginDTO): Promise<any> {
         const userToAttempt: any = await this.usersService.findOneByEmail(loginAttempt.email);
