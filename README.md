@@ -33,6 +33,14 @@
 ```bash
 $ npm install
 ```
+## Running the Docker
+Check docker-compose.yml and change volumes
+
+```bash
+# development
+$ cd Docker
+$ docker-compose up -d
+```
 
 ## Running the app
 
