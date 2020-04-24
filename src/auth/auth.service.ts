@@ -6,18 +6,18 @@ import { UserService } from '../user/user.service';
 export class AuthService {
   constructor(private readonly userService: UserService) { }
 
-  async createToken(username: string) {
+  async createToken(email: string) {
     const expiresIn = 60 * 60;
     const secretOrKey = 'secret';
-    const user = { username };
+    const user = { email };
     const token = jwt.sign(user, secretOrKey, { expiresIn });
 
     return { expires_in: expiresIn, token };
   }
 
   async validateUser(signedUser): Promise<boolean> {
-    if (signedUser&&signedUser.username) {
-      return Boolean(this.userService.getUserByUsername(signedUser.username));
+    if (signedUser&&signedUser.email) {
+      return Boolean(this.userService.findOneByEmail(signedUser.email));
     }
 
     return false;

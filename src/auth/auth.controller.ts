@@ -15,17 +15,17 @@ export class AuthController {
     
     @Post('login')
     async loginUser(@Response() res: any, @Body() body: User) {
-      if (!(body && body.username && body.password)) {
+      if (!(body && body.email && body.password)) {
         return res.status(HttpStatus.FORBIDDEN).json({ message: 'Username and password are required!' });
       }
   
-      const user = await this.userService.getUserByUsername(body.username);
-
+      const user = await this.userService.findOneByEmail(body.email);
+      
       if (user) {
-        const resHash = await this.userService.compareHash(body.password, user[0].password)
+        const resHash = await this.userService.compareHash(body.password, user.password)
         
         if (resHash) {
-          const token = await this.authService.createToken(user[0].username)
+          const token = await this.authService.createToken(user.email)
           
           return res.status(HttpStatus.OK).json(token);
         }
@@ -36,20 +36,20 @@ export class AuthController {
 
     @Post('register')
     async registerUser(@Response() res: any, @Body() body: User) {
-      if (!(body && body.username && body.password)) {
+      
+      if (!(body && body.email && body.password)) {
         return res.status(HttpStatus.FORBIDDEN).json({ message: 'Username and password are required!' });
       }
-
-      let user = await this.userService.getUserByUsername(body.username);
-      console.log('getUserByUsername', user)
-      if (!user.username) {
+      let user = await this.userService.findOneByEmail(body.email);
+      
+      if (!user) {
         user = await this.userService.createUser(body);
         if (user) {
           console.log("user", user);
         }
         
       } else {
-        return res.status(HttpStatus.FORBIDDEN).json({ message: 'Username exists' });
+        return res.status(HttpStatus.FORBIDDEN).json({ message: 'User exists' });
       }
 
       return res.status(HttpStatus.OK).json(user);

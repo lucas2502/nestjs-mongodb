@@ -22,7 +22,7 @@ export class CreateUserDTO {
     @MaxLength(100)
     readonly username: string;
 
-    /* @IsNotEmpty()
+    @IsNotEmpty()
     @IsString()
     @MinLength(2)
     @MaxLength(100)
@@ -33,7 +33,7 @@ export class CreateUserDTO {
     @MinLength(2)
     @MaxLength(100)
     readonly email: string;
-    */
+    
     @IsNotEmpty()
     @IsString()
     @MinLength(2)
